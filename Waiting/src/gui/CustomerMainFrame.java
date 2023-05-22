@@ -286,7 +286,6 @@ public class CustomerMainFrame extends JFrame  implements ActionListener{
 		b1.addActionListener(this);
 		
 
-		//test
 
 	}
 	
