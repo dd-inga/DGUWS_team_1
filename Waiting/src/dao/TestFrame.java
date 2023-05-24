@@ -1,10 +1,14 @@
 package dao;
 
-public class TestFrame {
+import javax.swing.JFrame;
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+public class TestFrame extends JFrame{
+	public TestFrame() {
+		setSize(300, 300);
+		setVisible(true);
 	}
-
+	
+	public static void main(String[] args) {
+		new TestFrame();
+	}
 }

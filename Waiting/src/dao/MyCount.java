@@ -1,10 +1,24 @@
 package dao;
 
-public class MyCount {
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.function.BooleanSupplier;
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+import gui.CustomerMainFrame;
 
+public class MyCount implements ActionListener{
+	
+	CustomerDaoCustomer daoc = CustomerDaoCustomer.getInstance();
+	public static int a = 0;
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if(a==1) {
+			CustomerMainFrame.wait.setText(daoc.select()+"");
+			a=0;
+		}
+	
 	}
-
+		
+		
 }
