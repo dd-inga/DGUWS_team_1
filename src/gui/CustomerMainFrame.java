@@ -20,7 +20,7 @@ public class CustomerMainFrame extends JFrame {
     private JTextArea waitingNumberArea;
     private CustomerList customerList;
     private JButton adminPageButton;
-    private AdminFrame adminFrame;
+    private AdminMainFrame adminFrame;
 
     private static boolean isAdminLoggedIn = false; // admin 페이지 로그인 성공 여부
     private int nextWaitingNumber = 0;
@@ -130,7 +130,7 @@ public class CustomerMainFrame extends JFrame {
     }
     
     void showAdminPage() {
-        adminFrame = new AdminFrame(this);
+        adminFrame = new AdminMainFrame(this);
         adminFrame.setVisible(true);
     }
 

@@ -16,4 +16,8 @@ public class CustomerList {
     public ArrayList<Customer> getCustomerList() {
         return customers;
     }
+
+    public void deleteCustomer(Customer customer) {
+        customers.remove(customer);
+    }
 }

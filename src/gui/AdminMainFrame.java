@@ -1,97 +1,188 @@
 package gui;
 
 import models.Customer;
+import models.CustomerList;
 
-import java.sql.Timestamp;
-import java.util.Vector;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class AdminMainFrame extends JFrame {
+    private CustomerMainFrame customerMainFrame;
+    private CustomerList customerList;
+    private JTextArea adminTextArea;
     private JPanel contentPane;
-    private JTable table;
+    private JTable customerListTable;
+    private DefaultTableModel tableModel;
 
-    // table param
-    public static Vector<String> getCustomerName() {
-        Vector<String> columnName = new Vector<>();
-        columnName.add("NO");
-        columnName.add("PHONE NUMBER");
-        columnName.add("PEOPLE COUNT");
-        columnName.add("STATE");
-        columnName.add("TIME");
-        columnName.add("SEND MESSAGE");
-        columnName.add("DELETE");
-        return columnName;
-    }
+    /*
+        TODO : this.this$0.customerList is null error fix
+     */
 
-    public static void main(String[] args) {
-        AdminMainFrame frame = new AdminMainFrame();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-    }
+    public AdminMainFrame(CustomerMainFrame customerMainFrame) {
+        this.customerMainFrame = customerMainFrame;
 
-    public AdminMainFrame() {
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 800, 400);
+        customerList.getCustomerList();
+        setBounds(100, 100, 1000, 600);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
-        setLocationRelativeTo(null);    // 가운데 정렬
 
-        Vector<String> columnName = getCustomerName();
-        Vector<Customer> customerData = new Vector<>();
+        setTitle("admin page");
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
 
-        long nowDate = System.currentTimeMillis();
-        Customer c1 = new Customer();
-        c1.setNo(0);
-        c1.setPhoneNumber("010-1234-5678");
-        c1.setPeopleCount(3);
-        c1.setTime(new Timestamp(nowDate));
-        c1.setState("대기중");
+        // table 설정
+        tableModel = new DefaultTableModel();
+        tableModel.addColumn("No");
+        tableModel.addColumn("Phone Number");
+        tableModel.addColumn("Count");
+        tableModel.addColumn("State");
+        tableModel.addColumn("Time");
+        tableModel.addColumn("Message send");
 
-        Customer c2 = new Customer();
-        c2.setNo(1);
-        c2.setPhoneNumber("010-4567-8901");
-        c2.setPeopleCount(5);
-        c2.setTime(new Timestamp(nowDate));
-        c2.setState("대기중");
-
-        customerData.add(c1);
-        customerData.add(c2);
-        DefaultTableModel tableModel = new DefaultTableModel(columnName, 0);
-
-        for (Customer customer : customerData) {
-            Vector<Object> row = new Vector<>();
-            row.addElement(customer.getNo());
-            row.addElement(customer.getPhoneNumber());
-            row.addElement(customer.getPeopleCount());
-            row.addElement(customer.getState());
-            row.addElement(customer.getTime());
-            // TODO : sendMessage, delete button 추가
-            tableModel.addRow(row);
+        for (Customer customer : customerMainFrame.getCustomerList()) {
+            Object[] rowData = {
+                    customer.getNo(),
+                    customer.getPhoneNumber(),
+                    customer.getPeopleCount(),
+                    customer.getState(),
+                    customer.getTime(),
+                    customer.isMessageDelivered()
+            };
+            tableModel.addRow(rowData);
         }
 
-        table = new JTable(tableModel);
-        contentPane.setLayout(null);
+        customerListTable = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(customerListTable);
+        contentPane.setLayout(new BorderLayout());
+        contentPane.add(scrollPane, BorderLayout.CENTER);
 
-        DefaultTableCellRenderer tableCellRenderer = new DefaultTableCellRenderer();
-        tableCellRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-
-        TableColumnModel columnModel = table.getColumnModel();
-
-        for (int i = 0; i < columnModel.getColumnCount(); i++) {
-            columnModel.getColumn(i).setCellRenderer(tableCellRenderer);
-        }
-
-        JLabel label = new JLabel("대기 명단");
+        JLabel label = new JLabel("고객 명단");
         label.setHorizontalAlignment(SwingConstants.CENTER);
         label.setBounds(5, 5, 780, 40);
-        contentPane.add(label);
+        contentPane.add(label, BorderLayout.NORTH);
 
-        JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBounds(5, 45, 780, 320);
+        scrollPane.setBounds(5, 45, 780, 220);
         contentPane.add(scrollPane);
+
+        // button 추가
+        JButton refreshButton = new JButton("refresh");
+        JButton sendMessageButton = new JButton("send message");
+        JButton updateStateButton = new JButton("update state");
+        JButton deleteButton = new JButton("delete");
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout());
+        buttonPanel.add(refreshButton);
+        buttonPanel.add(sendMessageButton);
+        buttonPanel.add(updateStateButton);
+        buttonPanel.add(deleteButton);
+
+        contentPane.add(buttonPanel, BorderLayout.SOUTH);
+
+        //새로 고침
+        refreshButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showDialog("새로고침 되었습니다");
+                updateCustomerTable();
+                AdminMainFrame frame = new AdminMainFrame(customerMainFrame);
+                setVisible(false);
+                new AdminMainFrame(customerMainFrame).setVisible(true);
+            }
+        });
+
+        //문자 전송
+        sendMessageButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = customerListTable.getSelectedRow();
+                if (selectedRow == -1) {
+                    showDialog("고객을 선택해주세요");
+                } else {
+                    // TODO : customerList null
+                    Customer customer = customerList.getCustomerList().get(selectedRow);
+                    if (customer.getState().equals("대기")) {
+                        customer.setMessageDelivered(true);
+                        tableModel.setValueAt(true, selectedRow, 5);
+                        showDialog("문자를 발송하였습니다");
+                    } else {
+                        showDialog("문자는 대기 상태일 때에만 전송 가능합니다");
+                    }
+                }
+            }
+        });
+
+        //상태 변환 버튼
+        updateStateButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = customerListTable.getSelectedRow();
+                if (selectedRow == -1) {
+                    showDialog("고객을 선택해주세요");
+                } else {
+                    String newState = changeStateDialog("새로운 상태를 입력하세요");
+                    // TODO : customerList null
+                    Customer customer = customerList.getCustomerList().get(selectedRow);
+                    customer.setState(newState);
+                    tableModel.setValueAt(newState, selectedRow, 3);
+                }
+            }
+        });
+
+        // 삭제 버튼
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = customerListTable.getSelectedRow();
+                if (selectedRow == -1) {
+                    showDialog("고객을 선택해주세요");
+                } else {
+                    // TODO : customerList null
+                    Customer customer = customerList.getCustomerList().get(selectedRow);
+                    customerList.deleteCustomer(customer);
+                    updateCustomerTable();
+                    showDialog("삭제 완료되었습니다");
+                }
+            }
+        });
+
+        updateCustomerTable();
+    }
+
+    private void updateCustomerTable() {
+        ArrayList<Customer> customerList = customerMainFrame.getCustomerList();
+        // 기존 데이터 초기화
+        tableModel.setRowCount(0);
+
+        for(Customer customer : customerList) {
+            Object[] rowData = {
+                    customer.getNo(),
+                    customer.getPhoneNumber(),
+                    customer.getPeopleCount(),
+                    customer.getState(),
+                    customer.getTime(),
+                    customer.isMessageDelivered()
+            };
+            tableModel.addRow(rowData);
+        }
+    }
+
+    private void showDialog(String str) {
+        JDialog dialog = new JDialog(this);
+        JOptionPane.showMessageDialog(dialog, str);
+        dialog.setVisible(true);
+    }
+
+    private String changeStateDialog(String str) {
+        JDialog dialog = new JDialog(this);
+        dialog.setVisible(true);
+        return JOptionPane.showInputDialog(dialog, str);
     }
 
 }
