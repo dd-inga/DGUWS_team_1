@@ -8,15 +8,17 @@ public class Customer {
     private int peopleCount;
     private String state;
     private Timestamp time;
+    private boolean messageDelivered;
 
     public Customer() {}
 
-    public Customer(int no, String phoneNumber, int peopleCount, String state, Timestamp time) {
+    public Customer(int no, String phoneNumber, int peopleCount, String state, Timestamp time, boolean messageDelivered) {
         this.no = no;
         this.phoneNumber = phoneNumber;
         this.peopleCount = peopleCount;
-        this.state = state;
+        this.state = "대기";
         this.time = time;
+        this.messageDelivered = false;
     }
 
     public int getNo() {
@@ -57,5 +59,13 @@ public class Customer {
 
     public void setTime(Timestamp time) {
         this.time = time;
+    }
+
+    public boolean isMessageDelivered() {
+        return messageDelivered;
+    }
+
+    public void setMessageDelivered(boolean messageDelivered) {
+        this.messageDelivered = messageDelivered;
     }
 }
