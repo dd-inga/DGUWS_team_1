@@ -19,14 +19,10 @@ public class AdminMainFrame extends JFrame {
     private JTable customerListTable;
     private DefaultTableModel tableModel;
 
-    /*
-        TODO : this.this$0.customerList is null error fix
-     */
-
-    public AdminMainFrame(CustomerMainFrame customerMainFrame) {
+    public AdminMainFrame(CustomerMainFrame customerMainFrame, CustomerList customerList) {
         this.customerMainFrame = customerMainFrame;
+        this.customerList = customerList;
 
-        customerList.getCustomerList();
         setBounds(100, 100, 1000, 600);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -91,9 +87,10 @@ public class AdminMainFrame extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 showDialog("새로고침 되었습니다");
                 updateCustomerTable();
-                AdminMainFrame frame = new AdminMainFrame(customerMainFrame);
+                AdminMainFrame frame = new AdminMainFrame(customerMainFrame, customerList);
                 setVisible(false);
-                new AdminMainFrame(customerMainFrame).setVisible(true);
+                new AdminMainFrame(customerMainFrame, customerList).setVisible(true);
+
             }
         });
 
@@ -105,7 +102,6 @@ public class AdminMainFrame extends JFrame {
                 if (selectedRow == -1) {
                     showDialog("고객을 선택해주세요");
                 } else {
-                    // TODO : customerList null
                     Customer customer = customerList.getCustomerList().get(selectedRow);
                     if (customer.getState().equals("대기")) {
                         customer.setMessageDelivered(true);
@@ -123,12 +119,15 @@ public class AdminMainFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = customerListTable.getSelectedRow();
+                System.out.println(selectedRow);
+
                 if (selectedRow == -1) {
                     showDialog("고객을 선택해주세요");
                 } else {
                     String newState = changeStateDialog("새로운 상태를 입력하세요");
-                    // TODO : customerList null
                     Customer customer = customerList.getCustomerList().get(selectedRow);
+                    System.out.println(customer.getState());
+
                     customer.setState(newState);
                     tableModel.setValueAt(newState, selectedRow, 3);
                 }
@@ -143,7 +142,6 @@ public class AdminMainFrame extends JFrame {
                 if (selectedRow == -1) {
                     showDialog("고객을 선택해주세요");
                 } else {
-                    // TODO : customerList null
                     Customer customer = customerList.getCustomerList().get(selectedRow);
                     customerList.deleteCustomer(customer);
                     updateCustomerTable();
