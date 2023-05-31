@@ -90,6 +90,7 @@ public class AdminMainFrame extends JFrame {
                 AdminMainFrame frame = new AdminMainFrame(customerMainFrame, customerList);
                 setVisible(false);
                 new AdminMainFrame(customerMainFrame, customerList).setVisible(true);
+
             }
         });
 
@@ -119,12 +120,14 @@ public class AdminMainFrame extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = customerListTable.getSelectedRow();
                 System.out.println(selectedRow);
+
                 if (selectedRow == -1) {
                     showDialog("고객을 선택해주세요");
                 } else {
                     String newState = changeStateDialog("새로운 상태를 입력하세요");
                     Customer customer = customerList.getCustomerList().get(selectedRow);
                     System.out.println(customer.getState());
+
                     customer.setState(newState);
                     tableModel.setValueAt(newState, selectedRow, 3);
                 }
