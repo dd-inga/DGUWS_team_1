@@ -27,7 +27,10 @@ public class CustomerMainFrame extends JFrame {
     private int waitingCountNumber;
     
     /* TODO : 현재 웨이팅 팀 수 보여주기
-            : 전화번호 11자리 입력 후에 인원 수 입력되도록 설정하기
+                - customerFrame : 등록 버튼 클릭했을 때 새로고침
+                - adminFrame : state(대기 -> 입장) 변경될 때 새로고침
+            : 전화번호 입력 버튼에 삭제, OK 버튼 추가
+            : OK 버튼 클릭 한 후 인원 수 input 에 focus 되고 버튼으로 입력되도록 수정
      */
 
     // constructor
@@ -130,7 +133,7 @@ public class CustomerMainFrame extends JFrame {
     }
     
     void showAdminPage() {
-        adminFrame = new AdminMainFrame(this);
+        adminFrame = new AdminMainFrame(this, customerList);
         adminFrame.setVisible(true);
     }
 
