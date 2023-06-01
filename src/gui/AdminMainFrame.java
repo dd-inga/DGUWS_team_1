@@ -81,7 +81,7 @@ public class AdminMainFrame extends JFrame {
 
         contentPane.add(buttonPanel, BorderLayout.SOUTH);
 
-        //새로 고침
+        // 새로 고침
         refreshButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -94,7 +94,7 @@ public class AdminMainFrame extends JFrame {
             }
         });
 
-        //문자 전송
+        // 문자 전송
         sendMessageButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -114,7 +114,7 @@ public class AdminMainFrame extends JFrame {
             }
         });
 
-        //상태 변환 버튼
+        // 상태 변환 버튼
         updateStateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -125,11 +125,15 @@ public class AdminMainFrame extends JFrame {
                     showDialog("고객을 선택해주세요");
                 } else {
                     String newState = changeStateDialog("새로운 상태를 입력하세요");
-                    Customer customer = customerList.getCustomerList().get(selectedRow);
-                    System.out.println(customer.getState());
+                    if (newState != null) {
+                        Customer customer = customerList.getCustomerList().get(selectedRow);
+                        System.out.println(customer.getState());
 
-                    customer.setState(newState);
-                    tableModel.setValueAt(newState, selectedRow, 3);
+                        customer.setState(newState);
+                        tableModel.setValueAt(newState, selectedRow, 3);
+                        showDialog("상태가 업데이트되었습니다");
+                        setVisible(true);
+                    }
                 }
             }
         });
@@ -146,6 +150,7 @@ public class AdminMainFrame extends JFrame {
                     customerList.deleteCustomer(customer);
                     updateCustomerTable();
                     showDialog("삭제 완료되었습니다");
+                    setVisible(true);
                 }
             }
         });
@@ -158,7 +163,7 @@ public class AdminMainFrame extends JFrame {
         // 기존 데이터 초기화
         tableModel.setRowCount(0);
 
-        for(Customer customer : customerList) {
+        for (Customer customer : customerList) {
             Object[] rowData = {
                     customer.getNo(),
                     customer.getPhoneNumber(),
@@ -174,13 +179,15 @@ public class AdminMainFrame extends JFrame {
     private void showDialog(String str) {
         JDialog dialog = new JDialog(this);
         JOptionPane.showMessageDialog(dialog, str);
-        dialog.setVisible(true);
+        dialog.dispose();
     }
 
     private String changeStateDialog(String str) {
         JDialog dialog = new JDialog(this);
         dialog.setVisible(true);
-        return JOptionPane.showInputDialog(dialog, str);
+        String input = JOptionPane.showInputDialog(dialog, str);
+        dialog.dispose();
+        return input;
     }
 
 }
