@@ -11,6 +11,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class CustomerMainFrame extends JFrame {
+    private int waitingCount = 0;
+    private JLabel waitingLabel;
     private JLabel titleLabel;
     private JLabel phoneNumberLabel;
     private JLabel countLabel;
@@ -40,9 +42,12 @@ public class CustomerMainFrame extends JFrame {
 
         // phoneNumber, count
         phoneNumberLabel = new JLabel("전화번호");
-        phoneNumberTextField = new JTextField(15);
+        phoneNumberTextField = new JTextField(11);
         countLabel = new JLabel("인원 수");
         countTextField = new JTextField(5);
+        waitingLabel = new JLabel("Waiting: " + waitingCount);
+        waitingLabel.setBounds(240, 200, 100, 30);
+        add(waitingLabel);
 
         JPanel buttonPanel = new JPanel(new GridLayout(4, 3, 5, 5));
 
@@ -56,10 +61,40 @@ public class CustomerMainFrame extends JFrame {
         zeroButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                phoneNumberTextField.setText(phoneNumberTextField.getText() + "0");
+                if (phoneNumberTextField.getText().length() < 11) {
+                    phoneNumberTextField.setText(phoneNumberTextField.getText() + "0");
+                } else {
+                    countTextField.setText(countTextField.getText() + "0");
+                }
             }
         });
+
+        // delete button
+        JButton deleteButton = new JButton("Del");
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String currentCount = countTextField.getText();
+                if (!currentCount.isEmpty()) {
+                    countTextField.setText(currentCount.substring(0, currentCount.length() - 1));
+                } else {
+                    String phoneNumberText = phoneNumberTextField.getText();
+                    if (!phoneNumberText.isEmpty()) {
+                        phoneNumberTextField.setText(phoneNumberText.substring(0, phoneNumberText.length() - 1));
+                    }
+                }
+            }
+        });
+
+        phoneNumberTextField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                countTextField.requestFocus();
+            }
+        });
+
         buttonPanel.add(zeroButton);
+        buttonPanel.add(deleteButton);
 
         // submit button
         submitButton = new JButton("등록");
@@ -81,13 +116,12 @@ public class CustomerMainFrame extends JFrame {
 
         // 위치, 크기 설정
         titleLabel.setBounds(200, 10, 100, 20);
-        buttonPanel.setBounds(20,40,200,200);
-        phoneNumberLabel.setBounds(240,40,80,30);
+        buttonPanel.setBounds(20, 40, 200, 200);
+        phoneNumberLabel.setBounds(240, 40, 80, 30);
         phoneNumberTextField.setBounds(300, 40, 150, 30);
         countLabel.setBounds(240, 80, 80, 30);
         countTextField.setBounds(300, 80, 150, 30);
-        submitButton.setBounds(240,150,80,30);
-
+        submitButton.setBounds(240, 150, 80, 30);
         adminPageButton.setBounds(20, 300, 80, 30);
 
         // component 추가
@@ -115,6 +149,9 @@ public class CustomerMainFrame extends JFrame {
             customerList.addCustomer(customer);
             phoneNumberTextField.setText("");
             countTextField.setText("");
+
+            waitingCount++;
+            waitingLabel.setText("Waiting: " + waitingCount);
         }
     }
 
@@ -126,15 +163,19 @@ public class CustomerMainFrame extends JFrame {
             showAdminPage();
         }
     }
-    
+
     void showAdminPage() {
         adminFrame = new AdminMainFrame(this, customerList);
-
         adminFrame.setVisible(true);
     }
 
     static void setAdminLoggedIn(boolean loggedIn) {
         isAdminLoggedIn = loggedIn;
+    }
+
+    public void updateWaitingCount(int count) {
+        waitingCount = count;
+        waitingLabel.setText("Waiting: " + waitingCount);
     }
 
     public ArrayList<Customer> getCustomerList() {
@@ -146,9 +187,12 @@ public class CustomerMainFrame extends JFrame {
         public void actionPerformed(ActionEvent e) {
             JButton sourceButton = (JButton) e.getSource();
             String buttonText = sourceButton.getText();
-
-            phoneNumberTextField.setText(phoneNumberTextField.getText() + buttonText);
-
+            if (phoneNumberTextField.getText().length() < 11) {
+                phoneNumberTextField.setText(phoneNumberTextField.getText() + buttonText);
+            } else {
+                String currentCount = countTextField.getText();
+                countTextField.setText(currentCount + buttonText);
+            }
         }
     }
 
