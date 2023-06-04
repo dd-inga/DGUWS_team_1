@@ -45,7 +45,7 @@ public class CustomerMainFrame extends JFrame {
         phoneNumberTextField = new JTextField(11);
         countLabel = new JLabel("인원 수");
         countTextField = new JTextField(5);
-        waitingLabel = new JLabel("Waiting: " + waitingCount);
+        waitingLabel = new JLabel("웨이팅 수: " + waitingCount);
         waitingLabel.setBounds(240, 200, 100, 30);
         add(waitingLabel);
 
@@ -53,11 +53,15 @@ public class CustomerMainFrame extends JFrame {
 
         for (int i = 1; i <= 9; i++) {
             JButton numberButton = new JButton(Integer.toString(i));
+            // numberButton.setBackground(Color.WHITE);
+            // numberButton.setFont(new Font("맑은 고딕", Font.BOLD, 16));
             numberButton.addActionListener(new NumberButtonActionListener());
             buttonPanel.add(numberButton);
         }
 
         JButton zeroButton = new JButton("0");
+        // zeroButton.setBackground(Color.WHITE);
+        // zeroButton.setFont(new Font("맑은 고딕", Font.BOLD, 16));
         zeroButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -71,6 +75,8 @@ public class CustomerMainFrame extends JFrame {
 
         // delete button
         JButton deleteButton = new JButton("Del");
+        // deleteButton.setBackground(Color.WHITE);
+        // deleteButton.setFont(new Font("맑은 고딕", Font.BOLD, 16));
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -108,7 +114,7 @@ public class CustomerMainFrame extends JFrame {
         });
 
         // admin page button
-        adminPageButton = new JButton("Admin");
+        adminPageButton = new JButton("관리자 모드");
         adminPageButton.addActionListener(e -> {
             System.out.println("관리자 페이지 이동");
             showAdminLoginDialog();
@@ -116,13 +122,13 @@ public class CustomerMainFrame extends JFrame {
 
         // 위치, 크기 설정
         titleLabel.setBounds(200, 10, 100, 20);
-        buttonPanel.setBounds(20, 40, 200, 200);
-        phoneNumberLabel.setBounds(240, 40, 80, 30);
-        phoneNumberTextField.setBounds(300, 40, 150, 30);
-        countLabel.setBounds(240, 80, 80, 30);
-        countTextField.setBounds(300, 80, 150, 30);
-        submitButton.setBounds(240, 150, 80, 30);
-        adminPageButton.setBounds(20, 300, 80, 30);
+        buttonPanel.setBounds(20, 60, 200, 200);
+        phoneNumberLabel.setBounds(240, 60, 80, 30);
+        phoneNumberTextField.setBounds(300, 60, 150, 30);
+        countLabel.setBounds(240, 100, 150, 30);
+        countTextField.setBounds(300, 100, 150, 30);
+        submitButton.setBounds(240, 170, 80, 30);
+        adminPageButton.setBounds(20, 300, 100, 30);
 
         // component 추가
         add(titleLabel);
@@ -151,7 +157,7 @@ public class CustomerMainFrame extends JFrame {
             countTextField.setText("");
 
             waitingCount++;
-            waitingLabel.setText("Waiting: " + waitingCount);
+            waitingLabel.setText("웨이팅 수: " + waitingCount);
         }
     }
 
@@ -175,7 +181,7 @@ public class CustomerMainFrame extends JFrame {
 
     public void updateWaitingCount(int count) {
         waitingCount = count;
-        waitingLabel.setText("Waiting: " + waitingCount);
+        waitingLabel.setText("웨이팅 수: " + waitingCount);
     }
 
     public ArrayList<Customer> getCustomerList() {
