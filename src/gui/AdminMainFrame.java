@@ -7,6 +7,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -155,7 +156,25 @@ public class AdminMainFrame extends JFrame {
             }
         });
 
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                updateWaitingCount();
+            }
+        });
+
         updateCustomerTable();
+    }
+
+    private void updateWaitingCount() {
+        int waitingCount = 0;
+        ArrayList<Customer> customers = customerMainFrame.getCustomerList();
+        for (Customer customer : customers) {
+            if (customer.getState().equals("대기")) {
+                waitingCount++;
+            }
+        }
+        customerMainFrame.updateWaitingCount(waitingCount);
     }
 
     private void updateCustomerTable() {

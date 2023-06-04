@@ -28,10 +28,6 @@ public class CustomerMainFrame extends JFrame {
     private int nextWaitingNumber = 0;
     private int waitingCountNumber;
 
-    /* TODO : 현재 웨이팅 팀 수 보여주기
-            : 전화번호 11자리 입력 후에 인원 수 입력되도록 설정하기
-     */
-
     // constructor
     public CustomerMainFrame() {
         customerList = new CustomerList();
@@ -73,6 +69,8 @@ public class CustomerMainFrame extends JFrame {
                 }
             }
         });
+
+        // delete button
         JButton deleteButton = new JButton("Del");
         deleteButton.addActionListener(new ActionListener() {
             @Override
@@ -89,17 +87,6 @@ public class CustomerMainFrame extends JFrame {
             }
         });
 
-
-
-
-        /*phoneNumberTextField.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (phoneNumberTextField.getText().length() == 11) {
-                    countTextField.requestFocus();
-                }
-            }
-        });*/
         phoneNumberTextField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -109,7 +96,6 @@ public class CustomerMainFrame extends JFrame {
 
         buttonPanel.add(zeroButton);
         buttonPanel.add(deleteButton);
-
 
         // submit button
         submitButton = new JButton("등록");
@@ -131,12 +117,12 @@ public class CustomerMainFrame extends JFrame {
 
         // 위치, 크기 설정
         titleLabel.setBounds(200, 10, 100, 20);
-        buttonPanel.setBounds(20,40,200,200);
-        phoneNumberLabel.setBounds(240,40,80,30);
+        buttonPanel.setBounds(20, 40, 200, 200);
+        phoneNumberLabel.setBounds(240, 40, 80, 30);
         phoneNumberTextField.setBounds(300, 40, 150, 30);
         countLabel.setBounds(240, 80, 80, 30);
         countTextField.setBounds(300, 80, 150, 30);
-        submitButton.setBounds(240,150,80,30);
+        submitButton.setBounds(240, 150, 80, 30);
         adminPageButton.setBounds(20, 300, 80, 30);
 
         // component 추가
@@ -158,8 +144,9 @@ public class CustomerMainFrame extends JFrame {
         if (!phoneNumber.isEmpty()) {
             long nowDate = System.currentTimeMillis();
             int waitingNumber = nextWaitingNumber++;
-            Customer customer = new Customer
-                    (waitingNumber, phoneNumber, count, "대기", new Timestamp(nowDate), false);
+
+            Customer customer = new Customer(waitingNumber, phoneNumber, count, "대기", new Timestamp(nowDate), false);
+
             customerList.addCustomer(customer);
             phoneNumberTextField.setText("");
             countTextField.setText("");
@@ -178,7 +165,7 @@ public class CustomerMainFrame extends JFrame {
             showAdminPage();
         }
     }
-    
+
     void showAdminPage() {
         adminFrame = new AdminMainFrame(this, customerList);
         adminFrame.setVisible(true);
@@ -188,23 +175,15 @@ public class CustomerMainFrame extends JFrame {
         isAdminLoggedIn = loggedIn;
     }
 
+    public void updateWaitingCount(int count) {
+        waitingCount = count;
+        waitingLabel.setText("Waiting: " + waitingCount);
+    }
+
     public ArrayList<Customer> getCustomerList() {
         return customerList.getCustomerList();
     }
 
-   /*  private class NumberButtonActionListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            JButton sourceButton = (JButton) e.getSource();
-            String buttonText = sourceButton.getText();
-            phoneNumberTextField.setText
-                    (phoneNumberTextField.getText() + buttonText);
-            if (phoneNumberTextField.getText().length()==11){
-                countTextField.requestFocus();
-            }
-            countTextField.setText(buttonText);
-        }
-    }*/
     private class NumberButtonActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
