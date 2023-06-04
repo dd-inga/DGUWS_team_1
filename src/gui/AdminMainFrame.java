@@ -14,7 +14,6 @@ import java.util.ArrayList;
 
 public class AdminMainFrame extends JFrame {
     private CustomerMainFrame customerMainFrame;
-    private CustomerList customerList;
     private JTextArea adminTextArea;
     private JPanel contentPane;
     private JTable customerListTable;
@@ -22,7 +21,6 @@ public class AdminMainFrame extends JFrame {
 
     public AdminMainFrame(CustomerMainFrame customerMainFrame, CustomerList customerList) {
         this.customerMainFrame = customerMainFrame;
-        this.customerList = customerList;
 
         setBounds(100, 100, 1000, 600);
         contentPane = new JPanel();
@@ -125,7 +123,7 @@ public class AdminMainFrame extends JFrame {
                 if (selectedRow == -1) {
                     showDialog("고객을 선택해주세요");
                 } else {
-                    String newState = changeStateDialog("새로운 상태를 입력하세요");
+                    String newState = changeStateDialog("새로운 상태를 선택하세요", new String[]{"대기", "입장", "퇴장"});
                     if (newState != null) {
                         Customer customer = customerList.getCustomerList().get(selectedRow);
                         System.out.println(customer.getState());
@@ -201,10 +199,10 @@ public class AdminMainFrame extends JFrame {
         dialog.dispose();
     }
 
-    private String changeStateDialog(String str) {
+    private String changeStateDialog(String str, String[] options) {
         JDialog dialog = new JDialog(this);
         dialog.setVisible(true);
-        String input = JOptionPane.showInputDialog(dialog, str);
+        String input = (String) JOptionPane.showInputDialog(dialog, str, "state selection", JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
         dialog.dispose();
         return input;
     }
