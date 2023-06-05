@@ -13,16 +13,10 @@ import java.util.ArrayList;
 
 public class CustomerMainFrame extends JFrame {
     private int waitingCount = 0;
-    private JLabel waitingLabel;
-    private JLabel titleLabel;
-    private JLabel phoneNumberLabel;
-    private JLabel countLabel;
-    private JTextField phoneNumberTextField;
-    private JTextField countTextField;
-    private JButton submitButton;
-    private CustomerList customerList;
-    private JButton adminPageButton;
-    private AdminMainFrame adminFrame;
+    private final JLabel waitingLabel;
+    private final JTextField phoneNumberTextField;
+    private final JTextField countTextField;
+    private final CustomerList customerList;
 
     private static boolean isAdminLoggedIn = false; // admin 페이지 로그인 성공 여부
     private int nextWaitingNumber = 0;
@@ -37,12 +31,12 @@ public class CustomerMainFrame extends JFrame {
         setLocationRelativeTo(null);
         setLayout(null);
 
-        titleLabel = new JLabel("식당 웨이팅");
+        JLabel titleLabel = new JLabel("식당 웨이팅");
 
         // phoneNumber, count
-        phoneNumberLabel = new JLabel("전화번호");
+        JLabel phoneNumberLabel = new JLabel("전화번호");
         phoneNumberTextField = new JTextField(11);
-        countLabel = new JLabel("인원 수");
+        JLabel countLabel = new JLabel("인원 수");
         countTextField = new JTextField(5);
         waitingLabel = new JLabel("Waiting: " + waitingCount);
         waitingLabel.setBounds(240, 200, 100, 30);
@@ -96,7 +90,7 @@ public class CustomerMainFrame extends JFrame {
         buttonPanel.add(deleteButton);
 
         // submit button
-        submitButton = new JButton("등록");
+        JButton submitButton = new JButton("등록");
         submitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -107,7 +101,7 @@ public class CustomerMainFrame extends JFrame {
         });
 
         // admin page button
-        adminPageButton = new JButton("Admin");
+        JButton adminPageButton = new JButton("Admin");
         adminPageButton.addActionListener(e -> {
             System.out.println("관리자 페이지 이동");
             showAdminLoginDialog();
@@ -189,12 +183,12 @@ public class CustomerMainFrame extends JFrame {
     }
 
     void showAdminPage() {
-        adminFrame = new AdminMainFrame(this, customerList);
+        AdminMainFrame adminFrame = new AdminMainFrame(this, customerList);
         adminFrame.setVisible(true);
     }
 
-    static void setAdminLoggedIn(boolean loggedIn) {
-        isAdminLoggedIn = loggedIn;
+    static void setAdminLoggedIn() {
+        isAdminLoggedIn = true;
     }
 
     public void updateWaitingCount(int count) {

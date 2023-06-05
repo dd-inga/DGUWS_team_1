@@ -14,7 +14,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
@@ -24,19 +23,17 @@ import models.CustomerList;
 //import sms.SendMessage;
 
 public class AdminMainFrame extends JFrame {
-    private CustomerMainFrame customerMainFrame;
-    private CustomerList customerList;
-    private JTextArea adminTextArea;
-    private JPanel contentPane;
-    private JTable customerListTable;
-    private DefaultTableModel tableModel;
+    private final CustomerMainFrame customerMainFrame;
+    private final CustomerList customerList;
+    private final JTable customerListTable;
+    private final DefaultTableModel tableModel;
 
     public AdminMainFrame(CustomerMainFrame customerMainFrame, CustomerList customerList) {
         this.customerMainFrame = customerMainFrame;
         this.customerList = customerList;
 
         setBounds(100, 100, 1000, 600);
-        contentPane = new JPanel();
+        JPanel contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
 
@@ -102,7 +99,6 @@ public class AdminMainFrame extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 showDialog("새로고침 되었습니다");
                 updateCustomerTable();
-                AdminMainFrame frame = new AdminMainFrame(customerMainFrame, customerList);
                 setVisible(false);
                 new AdminMainFrame(customerMainFrame, customerList).setVisible(true);
 
@@ -139,7 +135,7 @@ public class AdminMainFrame extends JFrame {
                 if (selectedRow == -1) {
                     showDialog("고객을 선택해주세요");
                 } else {
-                    String newState = changeStateDialog("새로운 상태를 선택하세요", new String[]{"대기", "입장", "퇴장"});
+                    String newState = changeStateDialog(new String[]{"대기", "입장", "퇴장"});
                     if (newState != null) {
                         Customer customer = customerList.getCustomerList().get(selectedRow);
                         System.out.println(customer.getState());
@@ -234,10 +230,10 @@ public class AdminMainFrame extends JFrame {
         dialog.dispose();
     }
 
-    private String changeStateDialog(String str, String[] options) {
+    private String changeStateDialog(String[] options) {
         JDialog dialog = new JDialog(this);
         dialog.setVisible(true);
-        String input = (String) JOptionPane.showInputDialog(dialog, str, "state selection", JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+        String input = (String) JOptionPane.showInputDialog(dialog, "새로운 상태를 선택하세요", "state selection", JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
         dialog.dispose();
         return input;
     }
@@ -261,7 +257,6 @@ public class AdminMainFrame extends JFrame {
             // 메시지를 발송
 //            SendMessage message= new SendMessage();
 //            message.sendOne(phoneNumber,customerInfo+text);
-            return;
         }
     }
 
