@@ -2,6 +2,7 @@ package gui;
 
 import models.Customer;
 import models.CustomerList;
+//import sms.SendMessage;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,21 +13,13 @@ import java.util.ArrayList;
 
 public class CustomerMainFrame extends JFrame {
     private int waitingCount = 0;
-    private JLabel waitingLabel;
-    private JLabel titleLabel;
-    private JLabel phoneNumberLabel;
-    private JLabel countLabel;
-    private JTextField phoneNumberTextField;
-    private JTextField countTextField;
-    private JButton submitButton;
-    private JTextArea waitingNumberArea;
-    private CustomerList customerList;
-    private JButton adminPageButton;
-    private AdminMainFrame adminFrame;
+    private final JLabel waitingLabel;
+    private final JTextField phoneNumberTextField;
+    private final JTextField countTextField;
+    private final CustomerList customerList;
 
     private static boolean isAdminLoggedIn = false; // admin 페이지 로그인 성공 여부
     private int nextWaitingNumber = 0;
-    private int waitingCountNumber;
 
     // constructor
     public CustomerMainFrame() {
@@ -38,17 +31,16 @@ public class CustomerMainFrame extends JFrame {
         setLocationRelativeTo(null);
         setLayout(null);
 
-        titleLabel = new JLabel("식당 웨이팅");
+        JLabel titleLabel = new JLabel("식당 웨이팅");
 
         // phoneNumber, count
-        phoneNumberLabel = new JLabel("전화번호");
+        JLabel phoneNumberLabel = new JLabel("전화번호");
         phoneNumberTextField = new JTextField(11);
-        countLabel = new JLabel("인원 수");
+        JLabel countLabel = new JLabel("인원 수");
         countTextField = new JTextField(5);
-        waitingLabel = new JLabel("Waiting: "+waitingCount);
-        waitingLabel.setBounds(240,200,100,30);
+        waitingLabel = new JLabel("Waiting: " + waitingCount);
+        waitingLabel.setBounds(240, 200, 100, 30);
         add(waitingLabel);
-
 
         JPanel buttonPanel = new JPanel(new GridLayout(4, 3, 5, 5));
 
@@ -98,7 +90,7 @@ public class CustomerMainFrame extends JFrame {
         buttonPanel.add(deleteButton);
 
         // submit button
-        submitButton = new JButton("등록");
+        JButton submitButton = new JButton("등록");
         submitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -109,7 +101,7 @@ public class CustomerMainFrame extends JFrame {
         });
 
         // admin page button
-        adminPageButton = new JButton("Admin");
+        JButton adminPageButton = new JButton("Admin");
         adminPageButton.addActionListener(e -> {
             System.out.println("관리자 페이지 이동");
             showAdminLoginDialog();
@@ -139,22 +131,46 @@ public class CustomerMainFrame extends JFrame {
 
     private void addCustomer() {
         String phoneNumber = phoneNumberTextField.getText().trim();
-        int count = Integer.parseInt(countTextField.getText().trim());
+        String countString = countTextField.getText().trim();
 
-        if (!phoneNumber.isEmpty()) {
-            long nowDate = System.currentTimeMillis();
-            int waitingNumber = nextWaitingNumber++;
-
-            Customer customer = new Customer(waitingNumber, phoneNumber, count, "대기", new Timestamp(nowDate), false);
-
-            customerList.addCustomer(customer);
-            phoneNumberTextField.setText("");
-            countTextField.setText("");
-
-            waitingCount++;
-            waitingLabel.setText("Waiting: " + waitingCount);
-
+        if (phoneNumber.isEmpty()) {	// 전화번호 입력되지 않았을 때
+            JOptionPane.showMessageDialog(this, "전화번호를 입력해주세요.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
+
+        if (countString.isEmpty()) {	// 인원 수 입력되지 않았을때
+            JOptionPane.showMessageDialog(this, "인원 수를 입력해주세요.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int count;
+        try {
+            count = Integer.parseInt(countString);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "올바른 인원 수를 입력해주세요.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        long nowDate = System.currentTimeMillis();
+        int waitingNumber = nextWaitingNumber++;
+
+        // 대기신청 완료 알림
+        // 등록된 고객 정보를 출력하는 문자열
+        String customerInfo = "전화번호: " + phoneNumber + "\n인원수: " + count +"\n대기팀:" + waitingCount;
+
+        // 등록 완료 알림 창 표시
+        JOptionPane.showMessageDialog(this, customerInfo + "\n대기신청이 완료되었습니다.", "알림", JOptionPane.INFORMATION_MESSAGE);
+//            SendMessage message= new SendMessage();
+//            message.sendOne(phoneNumber,customerInfo + "\n대기신청이 완료되었습니다.");
+//
+        Customer customer = new Customer(waitingNumber, phoneNumber, count, "대기", new Timestamp(nowDate), false, waitingCount);
+
+        customerList.addCustomer(customer);
+        phoneNumberTextField.setText("");
+        countTextField.setText("");
+
+        waitingCount++;
+        waitingLabel.setText("Waiting: " + waitingCount);
     }
 
     private void showAdminLoginDialog() {
@@ -167,12 +183,12 @@ public class CustomerMainFrame extends JFrame {
     }
 
     void showAdminPage() {
-        adminFrame = new AdminMainFrame(this, customerList);
+        AdminMainFrame adminFrame = new AdminMainFrame(this, customerList);
         adminFrame.setVisible(true);
     }
 
-    static void setAdminLoggedIn(boolean loggedIn) {
-        isAdminLoggedIn = loggedIn;
+    static void setAdminLoggedIn() {
+        isAdminLoggedIn = true;
     }
 
     public void updateWaitingCount(int count) {

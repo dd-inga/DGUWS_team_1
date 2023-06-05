@@ -1,29 +1,39 @@
 package gui;
 
-import models.Customer;
-import models.CustomerList;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+
+import models.Customer;
+import models.CustomerList;
+//import sms.SendMessage;
+
 public class AdminMainFrame extends JFrame {
-    private CustomerMainFrame customerMainFrame;
-    private JTextArea adminTextArea;
-    private JPanel contentPane;
-    private JTable customerListTable;
-    private DefaultTableModel tableModel;
+    private final CustomerMainFrame customerMainFrame;
+    private final CustomerList customerList;
+    private final JTable customerListTable;
+    private final DefaultTableModel tableModel;
 
     public AdminMainFrame(CustomerMainFrame customerMainFrame, CustomerList customerList) {
         this.customerMainFrame = customerMainFrame;
+        this.customerList = customerList;
 
         setBounds(100, 100, 1000, 600);
-        contentPane = new JPanel();
+        JPanel contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
 
@@ -39,6 +49,8 @@ public class AdminMainFrame extends JFrame {
         tableModel.addColumn("State");
         tableModel.addColumn("Time");
         tableModel.addColumn("Message send");
+        tableModel.addColumn("대기번호");
+
 
         for (Customer customer : customerMainFrame.getCustomerList()) {
             Object[] rowData = {
@@ -47,7 +59,8 @@ public class AdminMainFrame extends JFrame {
                     customer.getPeopleCount(),
                     customer.getState(),
                     customer.getTime(),
-                    customer.isMessageDelivered()
+                    customer.isMessageDelivered(),
+                    customer.getWaitingNumber()
             };
             tableModel.addRow(rowData);
         }
@@ -86,7 +99,6 @@ public class AdminMainFrame extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 showDialog("새로고침 되었습니다");
                 updateCustomerTable();
-                AdminMainFrame frame = new AdminMainFrame(customerMainFrame, customerList);
                 setVisible(false);
                 new AdminMainFrame(customerMainFrame, customerList).setVisible(true);
 
@@ -123,15 +135,23 @@ public class AdminMainFrame extends JFrame {
                 if (selectedRow == -1) {
                     showDialog("고객을 선택해주세요");
                 } else {
-                    String newState = changeStateDialog("새로운 상태를 선택하세요", new String[]{"대기", "입장", "퇴장"});
+                    String newState = changeStateDialog(new String[]{"대기", "입장", "퇴장"});
                     if (newState != null) {
                         Customer customer = customerList.getCustomerList().get(selectedRow);
                         System.out.println(customer.getState());
+
+                        if (customer.getState().equals("대기") && !newState.equals("대기")) {
+                            customer.setWaitingNumber(0); // 대기번호 초기화
+                            tableModel.setValueAt(0, selectedRow, 6); // 대기번호 열 업데이트
+                        }
 
                         customer.setState(newState);
                         tableModel.setValueAt(newState, selectedRow, 3);
                         showDialog("상태가 업데이트되었습니다");
                         setVisible(true);
+                        updateWaitingCount();
+                        updateCustomerTable();
+                        announceReservation();
                     }
                 }
             }
@@ -150,18 +170,21 @@ public class AdminMainFrame extends JFrame {
                     updateCustomerTable();
                     showDialog("삭제 완료되었습니다");
                     setVisible(true);
+                    updateWaitingCount();
+                    updateCustomerTable();
+                    announceReservation();
                 }
             }
         });
 
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosed(WindowEvent e) {
-                updateWaitingCount();
-            }
-        });
-
-        updateCustomerTable();
+//        addWindowListener(new WindowAdapter() {
+//            @Override
+//            public void windowClosed(WindowEvent e) {
+//                updateWaitingCount();
+//            }
+//        });
+//
+//        updateCustomerTable();
     }
 
     private void updateWaitingCount() {
@@ -180,14 +203,22 @@ public class AdminMainFrame extends JFrame {
         // 기존 데이터 초기화
         tableModel.setRowCount(0);
 
+        int waitingNumber = 1; // 대기번호 초기값 설정
+
         for (Customer customer : customerList) {
+            if (customer.getState().equals("대기")) {
+                customer.setWaitingNumber(waitingNumber); // 대기번호 다시 지정
+                waitingNumber++; // 대기번호 증가
+            }
             Object[] rowData = {
                     customer.getNo(),
                     customer.getPhoneNumber(),
                     customer.getPeopleCount(),
                     customer.getState(),
                     customer.getTime(),
-                    customer.isMessageDelivered()
+                    customer.isMessageDelivered(),
+                    customer.getWaitingNumber(),
+                    customer.getWaitingNumber()
             };
             tableModel.addRow(rowData);
         }
@@ -199,12 +230,34 @@ public class AdminMainFrame extends JFrame {
         dialog.dispose();
     }
 
-    private String changeStateDialog(String str, String[] options) {
+    private String changeStateDialog(String[] options) {
         JDialog dialog = new JDialog(this);
         dialog.setVisible(true);
-        String input = (String) JOptionPane.showInputDialog(dialog, str, "state selection", JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+        String input = (String) JOptionPane.showInputDialog(dialog, "새로운 상태를 선택하세요", "state selection", JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
         dialog.dispose();
         return input;
+    }
+
+    // 대기 번호가 3인 고객 데이터 가져오기
+    private Customer getCustomerWithWaitingNumber3() {
+        for (Customer customer : customerList.getCustomerList()) {
+            if (customer.getWaitingNumber() == 3) {
+                return customer;
+            }
+        }
+        return null; // 대기 번호가 3인 고객이 없을 경우 null 반환
+    }
+    private void announceReservation() {
+        Customer customer = getCustomerWithWaitingNumber3();
+        if (customer != null) {
+            String phoneNumber = customer.getPhoneNumber();
+            String customerInfo = "전화번호: " + phoneNumber + "\n인원수: " + customer.getPeopleCount() ;
+            String text = "\n\n예약이 3팀 남았습니다. \n입장을 준비해주세요";
+
+            // 메시지를 발송
+//            SendMessage message= new SendMessage();
+//            message.sendOne(phoneNumber,customerInfo+text);
+        }
     }
 
 }
