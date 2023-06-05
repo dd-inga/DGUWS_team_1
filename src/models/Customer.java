@@ -9,16 +9,18 @@ public class Customer {
     private String state;
     private Timestamp time;
     private boolean messageDelivered;
+    private int waitingNumber;
 
     public Customer() {}
 
-    public Customer(int no, String phoneNumber, int peopleCount, String state, Timestamp time, boolean messageDelivered) {
+    public Customer(int no, String phoneNumber, int peopleCount, String state, Timestamp time, boolean messageDelivered, int waitNum) {
         this.no = no;
         this.phoneNumber = phoneNumber;
         this.peopleCount = peopleCount;
         this.state = "대기";
         this.time = time;
         this.messageDelivered = false;
+        this.waitingNumber = waitNum+1;
     }
 
     public int getNo() {
@@ -67,5 +69,13 @@ public class Customer {
 
     public void setMessageDelivered(boolean messageDelivered) {
         this.messageDelivered = messageDelivered;
+    }
+
+    public int getWaitingNumber() {
+        return waitingNumber;
+    }
+
+    public void setWaitingNumber(int num) {
+        this.waitingNumber = num;
     }
 }

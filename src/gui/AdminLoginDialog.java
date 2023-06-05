@@ -8,10 +8,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class AdminLoginDialog extends JDialog {
-    private JPasswordField passwordField;   // 비밀번호 입력
+    private JPasswordField passwordField;
     private JButton loginButton;
 
-    private final String adminPassword 
+    private final String adminPassword
             = PasswordStorage.getAdminPassword();   // admin 비밀번호
 
     public AdminLoginDialog(Frame owner) {
@@ -21,7 +21,6 @@ public class AdminLoginDialog extends JDialog {
         setLocationRelativeTo(owner);
         setLayout(null);
 
-//        JPanel panel = new JPanel(new GridLayout(2, 2, 3, 3));
         JLabel passwordLabel = new JLabel("Password:");
         passwordField = new JPasswordField(5);
         loginButton = new JButton("login");
